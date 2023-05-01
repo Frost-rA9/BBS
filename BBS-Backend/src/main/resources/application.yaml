@@ -4,3 +4,19 @@ spring:
     url: jdbc:mysql://192.168.56.117:3306/bbs?useUnicode=true&characterEncoding=utf-8
     username: root
     password: 1123581321345589
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 1034154057@qq.com
+    password: odyvknsaqjnjbaig
+    properties:
+      from: 1034154057@qq.com
+      mail:
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+  data:
+    redis:
+      database: 0
+      host: localhost
+      port: 6379

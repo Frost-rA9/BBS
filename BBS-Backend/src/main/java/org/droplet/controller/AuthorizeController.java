@@ -1,5 +1,6 @@
 package org.droplet.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.Pattern;
 import org.droplet.Entity.ResultBean;
 import org.droplet.service.AuthorizeService;
@@ -15,15 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthorizeController {
 
-    private final String EMAIL_REGEXP = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\n";
+    private final String EMAIL_REGEXP = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
 
     @Autowired
     private AuthorizeService authorizeService;
 
     @PostMapping("/valid-email")
     public ResultBean<String> validateEmail(@Pattern(regexp = EMAIL_REGEXP)
-                                            @RequestParam("email") String email) {
-        if (authorizeService.sendValidateEmail(email)) {
+                                            @RequestParam("email") String email, HttpSession session) {
+        if (authorizeService.sendValidateEmail(email, session.getId())) {
             return ResultBean.success("邮件发送成功，请注意查收");
         } else {
             return ResultBean.failure(400, "邮件发送失败，请联系管理员");

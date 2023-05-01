@@ -5,5 +5,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface AuthorizeService extends UserDetailsService {
-    boolean sendValidateEmail(String email);
+    boolean sendValidateEmail(String email,String sessionId);
 }
