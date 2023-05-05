@@ -135,6 +135,6 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public Boolean resetPassword(String password, String email) {
         password = bCryptPasswordEncoder.encode(password);
-        return userMapper.resetPasswordByEmail(password, email) > 0;
+        return userMapper.resetPasswordByEmail(email, password) > 0;
     }
 }

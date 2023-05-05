@@ -1,5 +1,5 @@
 <template>
-  <div>欢迎{{ store.auth.user }}进入论坛系统</div>
+  <div>欢迎{{ store.auth.user.username }}进入论坛系统</div>
   <div>
     <el-button @click="logout()" type="danger">退出登录</el-button>
   </div>
