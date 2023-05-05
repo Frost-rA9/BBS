@@ -1,6 +1,6 @@
 package org.droplet.service.impl;
 
-import org.droplet.Entity.Account;
+import org.droplet.Entity.auth.Account;
 import org.droplet.mapper.UserMapper;
 import org.droplet.service.AuthorizeService;
 import org.springframework.beans.factory.annotation.Autowired;

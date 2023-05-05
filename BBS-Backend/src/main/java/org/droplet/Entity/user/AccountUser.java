@@ -1,14 +1,10 @@
-package org.droplet.Entity;
+package org.droplet.Entity.user;
 
 import lombok.Data;
 
 @Data
-public class Account {
+public class AccountUser {
     int id;
-
     String username;
-
-    String password;
-
     String email;
 }
