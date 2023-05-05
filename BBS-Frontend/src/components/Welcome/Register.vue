@@ -5,9 +5,9 @@
       <div style="font-size: 15px;color: grey">欢迎注册论坛系统，请在下面填写相关信息</div>
     </div>
     <div style="margin-top: 50px">
-      <el-form :model="from" :rules="rules" @validate="onValidate" ref="formRef">
+      <el-form :model="form" :rules="rules" @validate="onValidate" ref="formRef">
         <el-form-item prop="username">
-          <el-input v-model="from.username" :maxlength="8" type="text" placeholder="用户名">
+          <el-input v-model="form.username" :maxlength="8" type="text" placeholder="用户名">
             <template #prefix>
               <el-icon>
                 <User/>
@@ -16,7 +16,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="from.password" :maxlength="16" type="password" placeholder="密码">
+          <el-input v-model="form.password" :maxlength="16" type="password" placeholder="密码">
             <template #prefix>
               <el-icon>
                 <Lock/>
@@ -25,7 +25,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="password_repeat">
-          <el-input v-model="from.password_repeat" :maxlength="16" type="password" placeholder="重复密码">
+          <el-input v-model="form.password_repeat" :maxlength="16" type="password" placeholder="重复密码">
             <template #prefix>
               <el-icon>
                 <Lock/>
@@ -34,7 +34,7 @@
           </el-input>
         </el-form-item>
         <el-form-item prop="email">
-          <el-input v-model="from.email" type="email" placeholder="电子邮件地址">
+          <el-input v-model="form.email" type="email" placeholder="电子邮件地址">
             <template #prefix>
               <el-icon>
                 <Message/>
@@ -45,7 +45,7 @@
         <el-form-item prop="code">
           <el-row :gutter="32">
             <el-col :span="16">
-              <el-input v-model="from.code" :maxlength="6" type="email" placeholder="验证码">
+              <el-input v-model="form.code" :maxlength="6" type="email" placeholder="验证码">
                 <template #prefix>
                   <el-icon>
                     <EditPen/>
@@ -80,7 +80,7 @@ import {reactive, ref} from "vue";
 import {ElMessage} from "element-plus";
 import {post} from "@/net";
 
-const from = reactive({
+const form = reactive({
   username: '',
   password: '',
   password_repeat: '',
@@ -101,7 +101,7 @@ const validateUsername = (rule, value, callback) => {
 const validatePassword = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请再次输入密码'))
-  } else if (value !== from.password) {
+  } else if (value !== form.password) {
     callback(new Error("两次输入的密码不一致"))
   } else {
     callback()
@@ -151,10 +151,10 @@ const register = () => {
   formRef.value.validate((isValid) => {
     if (isValid) {
       post('/api/auth/register', {
-        username: from.username,
-        password: from.password,
-        email: from.email,
-        code: from.code
+        username: form.username,
+        password: form.password,
+        email: form.email,
+        code: form.code
       }, (message) => {
         ElMessage.success(message)
         router.push('/')
@@ -166,8 +166,8 @@ const register = () => {
 }
 
 const validateEmail = () => {
-  post('/api/auth/valid-email', {
-    email: from.email
+  post('/api/auth/valid-register-email', {
+    email: form.email
   }, (message) => {
     ElMessage.success(message)
     coldTime.value = 60

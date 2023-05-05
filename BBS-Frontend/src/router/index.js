@@ -14,9 +14,14 @@ const router = createRouter({
           component: () => import('@/components/Welcome/Login.vue')
         },
         {
-          path: '/register',
+          path: 'register',
           name: 'welcome-register',
           component: () => import('@/components/Welcome/Register.vue')
+        },
+        {
+          path: 'forget',
+          name: 'welcome-forget',
+          component: () => import('@/components/Welcome/Forget.vue')
         }
       ]
     },

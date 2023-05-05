@@ -53,15 +53,19 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     }
 
     @Override
-    public String sendValidateEmail(String email, String sessionId) {
-        String key = "email:" + sessionId + ":" + email;
+    public String sendValidateEmail(String email, String sessionId, Boolean hasAccount) {
+        String key = "email:" + sessionId + ":" + email + ":" + hasAccount;
         if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(key))) {
             Long expire = Optional.ofNullable(stringRedisTemplate.getExpire(key, TimeUnit.SECONDS)).orElse(0L);
             if (expire > 120) {
                 return "请求过于频繁，请稍后再试";
             }
         }
-        if (userMapper.findAccountByNameOrEmail(email) != null) {
+        Account account = userMapper.findAccountByNameOrEmail(email);
+        if (hasAccount && account == null) {
+            return "不存在此    账户";
+        }
+        if (!hasAccount && account != null) {
             return "此邮箱已被注册";
         }
         Random random = new Random();
@@ -83,13 +87,18 @@ public class AuthorizeServiceImpl implements AuthorizeService {
 
     @Override
     public String validateAndRegister(String username, String password, String email, String code, String sessionId) {
-        String key = "email:" + sessionId + ":" + email;
+        String key = "email:" + sessionId + ":" + email + ":false";
         if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(key))) {
             String cachedCode = stringRedisTemplate.opsForValue().get(key);
             if (cachedCode == null) {
                 return "验证码失效，请重新发送验证码";
             }
             if (cachedCode.equals(code)) {
+                Account account = userMapper.findAccountByNameOrEmail(username);
+                if (account != null) {
+                    return "此用户名已被注册，请更换用户名";
+                }
+                stringRedisTemplate.delete(key);
                 password = bCryptPasswordEncoder.encode(password);
                 if (userMapper.createAccount(username, password, email) > 0) {
                     return null;
@@ -102,5 +111,30 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         } else {
             return "请先发送验证码";
         }
+    }
+
+    @Override
+    public String validaOnly(String email, String code, String sessionId) {
+        String key = "email:" + sessionId + ":" + email + ":true";
+        if (Boolean.TRUE.equals(stringRedisTemplate.hasKey(key))) {
+            String cachedCode = stringRedisTemplate.opsForValue().get(key);
+            if (cachedCode == null) {
+                return "验证码失效，请重新发送验证码";
+            }
+            if (cachedCode.equals(code)) {
+                stringRedisTemplate.delete(key);
+                return null;
+            } else {
+                return "验证码错误";
+            }
+        } else {
+            return "请先发送验证码";
+        }
+    }
+
+    @Override
+    public Boolean resetPassword(String password, String email) {
+        password = bCryptPasswordEncoder.encode(password);
+        return userMapper.resetPasswordByEmail(password, email) > 0;
     }
 }

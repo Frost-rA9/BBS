@@ -24,10 +24,21 @@ public class AuthorizeController {
     @Autowired
     private AuthorizeService authorizeService;
 
-    @PostMapping("/valid-email")
-    public ResultBean<String> validateEmail(@Pattern(regexp = EMAIL_REGEXP)
-                                            @RequestParam("email") String email, HttpSession session) {
-        String resultStr = authorizeService.sendValidateEmail(email, session.getId());
+    @PostMapping("/valid-register-email")
+    public ResultBean<String> validateRegisterEmail(@Pattern(regexp = EMAIL_REGEXP)
+                                                    @RequestParam("email") String email, HttpSession session) {
+        String resultStr = authorizeService.sendValidateEmail(email, session.getId(), false);
+        if (resultStr == null) {
+            return ResultBean.success("邮件发送成功，请注意查收");
+        } else {
+            return ResultBean.failure(400, resultStr);
+        }
+    }
+
+    @PostMapping("/valid-reset-email")
+    public ResultBean<String> validateResetEmail(@Pattern(regexp = EMAIL_REGEXP)
+                                                 @RequestParam("email") String email, HttpSession session) {
+        String resultStr = authorizeService.sendValidateEmail(email, session.getId(), true);
         if (resultStr == null) {
             return ResultBean.success("邮件发送成功，请注意查收");
         } else {
@@ -51,6 +62,36 @@ public class AuthorizeController {
             return ResultBean.success("注册成功");
         } else {
             return ResultBean.failure(400, resultStr);
+        }
+    }
+
+    @PostMapping("/start-reset")
+    public ResultBean<String> startReset(@Pattern(regexp = EMAIL_REGEXP)
+                                         @RequestParam("email") String email,
+                                         @Length(min = 6, max = 6)
+                                         @RequestParam("code") String code,
+                                         HttpSession session) {
+        String resultStr = authorizeService.validaOnly(email, code, session.getId());
+        if (resultStr == null) {
+            session.setAttribute("reset-password", email);
+            return ResultBean.success();
+        } else {
+            return ResultBean.failure(400, resultStr);
+        }
+    }
+
+    @PostMapping("/do-reset")
+    public ResultBean<String> resetPassword(@Length(min = 6, max = 16)
+                                            @RequestParam("password") String password,
+                                            HttpSession session) {
+        String email = (String) session.getAttribute("reset-password");
+        if (email == null) {
+            return ResultBean.failure(401, "请先完成邮箱验证");
+        } else if (authorizeService.resetPassword(password, email)) {
+            session.removeAttribute("reset-password");
+            return ResultBean.success("密码重置成功");
+        } else {
+            return ResultBean.failure(500, "内部错误，请联系管理员");
         }
     }
 }

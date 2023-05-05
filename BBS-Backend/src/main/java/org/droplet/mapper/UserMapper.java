@@ -1,9 +1,6 @@
 package org.droplet.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 import org.droplet.Entity.Account;
 
 @Mapper
@@ -13,4 +10,7 @@ public interface UserMapper {
 
     @Insert("insert into db_account(username, password, email) values(#{username},#{password},#{email})")
     int createAccount(@Param("username") String username, @Param("password") String password, @Param("email") String email);
+
+    @Update("update db_account set password = #{password} where email = #{email}")
+    int resetPasswordByEmail(@Param("email") String email,@Param("password") String password);
 }
