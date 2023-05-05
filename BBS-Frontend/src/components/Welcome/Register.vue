@@ -55,7 +55,7 @@
             </el-col>
             <el-col :span="6">
               <el-button type="success" @click="validateEmail()" :disabled="!isEmailValid || coldTime >0">
-                {{ coldTime > 0 ? '请稍后' + coldTime + '秒' : '获取验证码'}}
+                {{ coldTime > 0 ? '请稍后' + coldTime + '秒' : '获取验证码' }}
               </el-button>
             </el-col>
           </el-row>
@@ -166,12 +166,14 @@ const register = () => {
 }
 
 const validateEmail = () => {
+  coldTime.value = 60
   post('/api/auth/valid-register-email', {
     email: form.email
   }, (message) => {
     ElMessage.success(message)
-    coldTime.value = 60
     setInterval(() => coldTime.value--, 1000)
+  }, () => {
+    coldTime.value = 0
   })
 }
 </script>
